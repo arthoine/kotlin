@@ -1,8 +1,10 @@
 package com.example.myapplication.ui.home
 
 import CustomAdapter
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -19,6 +21,7 @@ class HomeFragment : Fragment() {
     private lateinit var editTextNote: EditText
     private lateinit var btnAjouter: Button
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,6 +54,20 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             }
         }
+        // Supprimer la note lors d'un glissement
+        listView.setOnTouchListener { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                // Récupérer la position de l'élément touché
+                val position = listView.pointToPosition(motionEvent.x.toInt(), motionEvent.y.toInt())
+                // Supprimer l'élément à cette position
+                if (position != AdapterView.INVALID_POSITION) {
+                    notes.removeAt(position)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+            true
+        }
+
 
         return view
     }
