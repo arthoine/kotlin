@@ -2,16 +2,15 @@ package com.example.myapplication.ui.home
 
 import CustomAdapter
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.myapplication.R
 import android.widget.ListView
-
+import androidx.core.content.ContextCompat
+import kotlin.math.abs
 
 
 class HomeFragment : Fragment() {
@@ -54,19 +53,66 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             }
         }
-        // Supprimer la note lors d'un glissement
+
+        val threshold = 500 // seuil en pixels
+        var selectedView: View? = null
+        var startX = 0f
+        var startY = 0f
+        var originalX = 0f
+        var originalY = 0f
+
         listView.setOnTouchListener { _, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                // Récupérer la position de l'élément touché
-                val position = listView.pointToPosition(motionEvent.x.toInt(), motionEvent.y.toInt())
-                // Supprimer l'élément à cette position
-                if (position != AdapterView.INVALID_POSITION) {
-                    notes.removeAt(position)
-                    adapter.notifyDataSetChanged()
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Trouvez l'élément de la liste sous le point de toucher
+                    val position = listView.pointToPosition(motionEvent.x.toInt(), motionEvent.y.toInt())
+                    selectedView = listView.getChildAt(position - listView.firstVisiblePosition)
+
+                    // Enregistrez les coordonnées de départ et les coordonnées originales
+                    selectedView?.let {
+                        startX = motionEvent.x - it.x
+                        startY = motionEvent.y - it.y
+                        originalX = it.x
+                        originalY = it.y
+                    }
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    // Déplacez l'élément de la liste sélectionné uniquement horizontalement
+                    selectedView?.let {
+                        val newX = motionEvent.x - startX
+                        // Restreindre le mouvement à l'axe X uniquement
+                        it.x = newX
+
+                        // Vérifiez si l'élément a été déplacé de plus de 500 pixels dans n'importe quelle direction
+                        if (Math.abs(newX - originalX) > threshold) {
+                            // Si oui, changez la couleur de fond de l'élément en rouge
+                            it.setBackgroundColor(Color.RED)
+                        } else {
+                            // Sinon, réinitialisez la couleur de fond à sa valeur par défaut
+                            it.setBackgroundColor(Color.WHITE)
+                        }
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Réinitialisez l'élément de la liste sélectionné à sa position d'origine
+                    selectedView?.let {
+                        it.x = originalX
+                        it.y = originalY
+                        it.setBackgroundColor(Color.WHITE)
+                        selectedView = null
+
+                        // Vérifiez si l'utilisateur a relâché l'élément au-delà du seuil
+                        if (Math.abs(it.x - originalX) > threshold) {
+                            // Si oui, supprimez l'élément de la liste
+                            // Assurez-vous d'avoir la référence à l'objet à supprimer
+                            // listView.removeView(it) // Supprimez l'élément de la vue
+                        }
+                    }
                 }
             }
             true
         }
+
 
 
         return view
