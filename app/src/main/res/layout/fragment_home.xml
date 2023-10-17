@@ -6,35 +6,51 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.home.HomeFragment">
-    <Button
-            android:id="@+id/buttonAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ajouter"
 
-            tools:ignore="MissingConstraints" tools:layout_editor_absoluteY="40dp"
-            tools:layout_editor_absoluteX="31dp"/>
+    <EditText
+            android:id="@+id/editTitleNote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/saisir_une_titre"
+            android:inputType="textMultiLine"
+            android:minHeight="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:autofillHints=""/>
+
     <EditText
             android:id="@+id/editTextNote"
-            android:layout_width="348dp"
-            android:layout_height="65dp"
-            android:hint="Saisir votre note ici"
-            tools:layout_editor_absoluteY="61dp"
-            tools:layout_editor_absoluteX="31dp"
-            tools:ignore="MissingConstraints"
-            app:layout_constraintTop_toBottomOf="@id/buttonAdd"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/saisir_une_note"
+            android:inputType="textMultiLine"
+            android:minHeight="48dp"
+            app:layout_constraintTop_toBottomOf="@id/editTitleNote"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:autofillHints=""/>
 
-    <TextView
-            android:id="@+id/textViewSavedNotes"
+    <Button
+            android:id="@+id/btnAjouter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="MissingConstraints"
+            android:text="@string/ajouter"
             app:layout_constraintTop_toBottomOf="@id/editTextNote"
-            android:layout_marginStart="40dp"
-            android:inputType="textMultiLine"
-            android:minLines="5"
-            android:maxLines="10"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"/>
+
+    <ListView
+            android:id="@+id/listeNotes"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/btnAjouter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,67 +1,57 @@
 package com.example.myapplication.ui.home
 
-import android.content.Context
+import CustomAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.R
-import com.example.myapplication.databinding.FragmentHomeBinding
+import android.widget.ListView
+
 
 
 class HomeFragment : Fragment() {
-
-    private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var listView: ListView
+    private lateinit var notes: MutableList<MutableList<String>>
+    private lateinit var editTitleNote: EditText
+    private lateinit var editTextNote: EditText
+    private lateinit var btnAjouter: Button
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        listView = view.findViewById(R.id.listeNotes)
+        editTitleNote = view.findViewById(R.id.editTitleNote)
+        editTextNote = view.findViewById(R.id.editTextNote)
+        btnAjouter = view.findViewById(R.id.btnAjouter)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        notes = mutableListOf() // Initialisez votre liste de listes vide
 
-        val editTextNote: EditText = root.findViewById(R.id.editTextNote)
-        val buttonAdd: Button = root.findViewById(R.id.buttonAdd)
-        val textViewSavedNotes: TextView = root.findViewById(R.id.textViewSavedNotes)
+        val adapter = CustomAdapter(requireContext(), notes)
+        listView.adapter = adapter
 
-        buttonAdd.setOnClickListener {
-            val noteText = editTextNote.text.toString()
+        // Lorsque le bouton d'ajout est cliqué
+        btnAjouter.setOnClickListener {
+            val title = editTitleNote.text.toString()
+            val note = editTextNote.text.toString()
 
-            val sharedPreferences = requireContext().getSharedPreferences("Notes", Context.MODE_PRIVATE)
-
-            // Récupérer toutes les notes existantes depuis les préférences partagées
-            val notesSet = sharedPreferences.getStringSet("notesKey", mutableSetOf()) ?: mutableSetOf()
-
-            // Ajouter la nouvelle note à la liste des notes
-            notesSet.add(noteText)
-
-            // Mettre à jour la liste des notes dans les préférences partagées
-            val editor = sharedPreferences.edit()
-            editor.putStringSet("notesKey", notesSet)
-            editor.apply()
-
-            // Afficher toutes les notes
-            textViewSavedNotes.text = notesSet.joinToString("\n")
+            if (title.isNotEmpty() && note.isNotEmpty()) {
+                val newNote: MutableList<String> = mutableListOf(title, note)
+                notes.add(newNote)
+                adapter.notifyDataSetChanged()
+                // Effacez les champs de texte après avoir ajouté la note
+                editTitleNote.text.clear()
+                editTextNote.text.clear()
+            } else {
+                // Affichez un message d'erreur si l'un des champs est vide
+                Toast.makeText(requireContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        // Reste du code...
-
-        return root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return view
     }
 }
