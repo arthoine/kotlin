@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.myapplication.R
@@ -85,9 +86,15 @@ class HomeFragment : Fragment() {
                         if (abs(newX) > threshold) {
                             // Si oui, changez la couleur de fond de l'élément en rouge
                             it.setBackgroundColor(Color.RED)
+                            // Chargez l'animation de paillettes
+                            val paillettesAnimation = AnimationUtils.loadAnimation(context, R.anim.paillettes)
+                            // Appliquez l'animation aux paillettes
+                            it.startAnimation(paillettesAnimation)
                         } else {
                             // Sinon, réinitialisez la couleur de fond à sa valeur par défaut
                             it.setBackgroundColor(Color.WHITE)
+                            // Arrêtez l'animation de paillettes
+                            it.clearAnimation()
                         }
                     }
                 }
@@ -96,6 +103,7 @@ class HomeFragment : Fragment() {
                     selectedView?.let {
                         it.x = originalX
                         it.y = originalY
+                        it.clearAnimation()
                         it.setBackgroundColor(Color.WHITE)
                         selectedView = null
 
@@ -114,12 +122,6 @@ class HomeFragment : Fragment() {
             }
             true
         }
-
-
-
-
-
-
         return view
     }
 }
