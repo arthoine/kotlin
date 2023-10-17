@@ -57,7 +57,6 @@ class HomeFragment : Fragment() {
         val threshold = 500 // seuil en pixels
         var selectedView: View? = null
         var startX = 0f
-        var startY = 0f
         var originalX = 0f
         var originalY = 0f
 
@@ -68,10 +67,9 @@ class HomeFragment : Fragment() {
                     val position = listView.pointToPosition(motionEvent.x.toInt(), motionEvent.y.toInt())
                     selectedView = listView.getChildAt(position - listView.firstVisiblePosition)
 
-                    // Enregistrez les coordonnées de départ et les coordonnées originales
+                    // Enregistrez les coordonnées de départ
                     selectedView?.let {
-                        startX = motionEvent.x - it.x
-                        startY = motionEvent.y - it.y
+                        startX = motionEvent.rawX
                         originalX = it.x
                         originalY = it.y
                     }
@@ -79,12 +77,12 @@ class HomeFragment : Fragment() {
                 MotionEvent.ACTION_MOVE -> {
                     // Déplacez l'élément de la liste sélectionné uniquement horizontalement
                     selectedView?.let {
-                        val newX = motionEvent.x - startX
+                        val newX = motionEvent.rawX - startX
                         // Restreindre le mouvement à l'axe X uniquement
-                        it.x = newX
+                        it.x = originalX + newX
 
                         // Vérifiez si l'élément a été déplacé de plus de 500 pixels dans n'importe quelle direction
-                        if (Math.abs(newX - originalX) > threshold) {
+                        if (abs(newX) > threshold) {
                             // Si oui, changez la couleur de fond de l'élément en rouge
                             it.setBackgroundColor(Color.RED)
                         } else {
@@ -101,17 +99,24 @@ class HomeFragment : Fragment() {
                         it.setBackgroundColor(Color.WHITE)
                         selectedView = null
 
-                        // Vérifiez si l'utilisateur a relâché l'élément au-delà du seuil
-                        if (Math.abs(it.x - originalX) > threshold) {
+                        // Vérifiez si l'utilisateur a déplacé l'élément au-delà du seuil
+                        val totalXMoved = abs(motionEvent.rawX - startX)
+                        if (totalXMoved > threshold) {
                             // Si oui, supprimez l'élément de la liste
-                            // Assurez-vous d'avoir la référence à l'objet à supprimer
-                            // listView.removeView(it) // Supprimez l'élément de la vue
+                            val position = listView.getPositionForView(it)
+                            if (position != AdapterView.INVALID_POSITION) {
+                                notes.removeAt(position)
+                                adapter.notifyDataSetChanged()
+                            }
                         }
                     }
                 }
             }
             true
         }
+
+
+
 
 
 
