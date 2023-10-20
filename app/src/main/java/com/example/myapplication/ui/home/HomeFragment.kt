@@ -32,12 +32,11 @@ class HomeFragment : Fragment() {
         editTextNote = view.findViewById(R.id.editTextNote)
         btnAjouter = view.findViewById(R.id.btnAjouter)
 
-        notes = mutableListOf() // Initialisez votre liste de listes vide
+        notes = mutableListOf()
 
         val adapter = CustomAdapter(requireContext(), notes)
         listView.adapter = adapter
 
-        // Lorsque le bouton d'ajout est cliqué
         btnAjouter.setOnClickListener {
             val title = editTitleNote.text.toString()
             val note = editTextNote.text.toString()
@@ -46,11 +45,9 @@ class HomeFragment : Fragment() {
                 val newNote: MutableList<String> = mutableListOf(title, note)
                 notes.add(newNote)
                 adapter.notifyDataSetChanged()
-                // Effacez les champs de texte après avoir ajouté la note
                 editTitleNote.text.clear()
                 editTextNote.text.clear()
             } else {
-                // Affichez un message d'erreur si l'un des champs est vide
                 Toast.makeText(requireContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             }
         }
@@ -64,11 +61,9 @@ class HomeFragment : Fragment() {
         listView.setOnTouchListener { _, motionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // Trouvez l'élément de la liste sous le point de toucher
                     val position = listView.pointToPosition(motionEvent.x.toInt(), motionEvent.y.toInt())
                     selectedView = listView.getChildAt(position - listView.firstVisiblePosition)
 
-                    // Enregistrez les coordonnées de départ
                     selectedView?.let {
                         startX = motionEvent.rawX
                         originalX = it.x
@@ -76,30 +71,21 @@ class HomeFragment : Fragment() {
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    // Déplacez l'élément de la liste sélectionné uniquement horizontalement
                     selectedView?.let {
                         val newX = motionEvent.rawX - startX
-                        // Restreindre le mouvement à l'axe X uniquement
                         it.x = originalX + newX
 
-                        // Vérifiez si l'élément a été déplacé de plus de 500 pixels dans n'importe quelle direction
                         if (abs(newX) > threshold) {
-                            // Si oui, changez la couleur de fond de l'élément en rouge
                             it.setBackgroundColor(Color.RED)
-                            // Chargez l'animation de paillettes
                             val paillettesAnimation = AnimationUtils.loadAnimation(context, R.anim.paillettes)
-                            // Appliquez l'animation aux paillettes
                             it.startAnimation(paillettesAnimation)
                         } else {
-                            // Sinon, réinitialisez la couleur de fond à sa valeur par défaut
                             it.setBackgroundColor(Color.WHITE)
-                            // Arrêtez l'animation de paillettes
                             it.clearAnimation()
                         }
                     }
                 }
                 MotionEvent.ACTION_UP -> {
-                    // Réinitialisez l'élément de la liste sélectionné à sa position d'origine
                     selectedView?.let {
                         it.x = originalX
                         it.y = originalY
@@ -107,10 +93,8 @@ class HomeFragment : Fragment() {
                         it.setBackgroundColor(Color.WHITE)
                         selectedView = null
 
-                        // Vérifiez si l'utilisateur a déplacé l'élément au-delà du seuil
                         val totalXMoved = abs(motionEvent.rawX - startX)
                         if (totalXMoved > threshold) {
-                            // Si oui, supprimez l'élément de la liste
                             val position = listView.getPositionForView(it)
                             if (position != AdapterView.INVALID_POSITION) {
                                 notes.removeAt(position)
