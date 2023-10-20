@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        val threshold = 500 // seuil en pixels
+        val threshold = 500
         var selectedView: View? = null
         var startX = 0f
         var originalX = 0f
